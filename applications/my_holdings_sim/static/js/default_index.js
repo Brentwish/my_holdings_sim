@@ -176,20 +176,28 @@ var app = function() {
     };
 
     self.search = () => {
+      //If they searched before all_stocks loads return from function
+      if (!self.vue.all_stocks) return false;
+
       //Map over all stocks and get their symbols
       //Filter out strings that don't contain self.vue.search_query
       //Reduce it into a comma separated string of tickers for the path params
-      const symbols = "symbols=" + self.vue.all_stocks.map( s => s.symbol )
+      let symbols = self.vue.all_stocks.map( s => s.symbol )
         .filter( s => s.match(self.vue.search_query.toUpperCase()))
         .slice(0, MAX_SEARCH_RESULT)
         .reduce((s, c) => s + c + ",", "").slice(0, -1);
-      const types = "types=price";
-      const path = `${ iex }/stock/market/batch?${ symbols }&${ types }`;
 
-      //Gets the price from each ticker in result
-      $.get(path, res => {
-        self.vue.search_result = res;
-      });
+      if (!symbols) {
+          self.vue.search_result = [];
+      } else {
+        //Gets the price from each ticker in result
+        const types = "types=price";
+        symbols = "symbols=" + symbols;
+        const path = `${ iex }/stock/market/batch?${ symbols }&${ types }`;
+        $.get(path, res => {
+          self.vue.search_result = res;
+        });
+      }
     }
 
     self.get_all_stocks = () => {
