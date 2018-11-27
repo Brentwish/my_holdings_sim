@@ -176,10 +176,20 @@ var app = function() {
     };
 
     self.search = () => {
-      //stock/${query}/batch?types=quote,stats,company,news,chart&range=5y
-      let endpoint = `https://api.iextrading.com/1.0/ref-data/symbols`;
-      //fetch(endpoint).then(res => console.log(res));
-      $.get(endpoint, res => console.log(res.map(i => i.iexID)));
+      //Map over all stocks and get their symbols
+      //Filter out strings that don't contain self.vue.search_query
+      //Reduce it into a comma separated string of tickers for the path params
+      const symbols = "symbols=" + self.vue.all_stocks.map( s => s.symbol )
+        .filter( s => s.match(self.vue.search_query.toUpperCase()))
+        .slice(0, MAX_SEARCH_RESULT)
+        .reduce((s, c) => s + c + ",", "").slice(0, -1);
+      const types = "types=price";
+      const path = `${ iex }/stock/market/batch?${ symbols }&${ types }`;
+
+      //Gets the price from each ticker in result
+      $.get(path, res => {
+        self.vue.search_result = res;
+      });
     }
 
     self.get_all_stocks = () => {
@@ -199,6 +209,7 @@ var app = function() {
             star_indices: [1, 2, 3, 4, 5],
 
             all_stocks: self.get_all_stocks(),
+            search_result: {},
             search_query: ""
         },
         methods: {

@@ -14,7 +14,8 @@
     var user_email = "{{='' if auth.user is None else auth.user.email}}";
     // Delete posts.
     var delete_post_url = "{{=URL('api', 'delete_post', user_signature=True)}}";
-    const iex = "https://api.iextrading.com/1.0/";
+    const iex = "https://api.iextrading.com/1.0";
+    const MAX_SEARCH_RESULT = 20;
 </script>
 {{end}}
 
@@ -27,9 +28,8 @@
         <input v-model="search_query" placeholder="Search"/>
         <button id="search" v-on:click="search">Search</button>
         <ul>
-          <li v-for="stock in all_stocks">
-            ${ stock.symbol } |
-            ${ stock.name }
+          <li v-for="(stock, symbol) in search_result">
+            ${ symbol } | ${ stock.price }
           </li>
         </ul>
       </div>
