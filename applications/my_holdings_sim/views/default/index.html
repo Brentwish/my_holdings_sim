@@ -1,24 +1,24 @@
 {{extend 'layout.html'}}
 
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
 {{block head}}
 <script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
   var add_post_url = "{{=URL('api', 'add_post', user_signature=True)}}";
-var get_post_list_url = "{{=URL('api', 'get_post_list')}}";
-// Like callbacks.
-var set_like_url = "{{=URL('api', 'set_like', user_signature=True)}}";
-var get_likers_url = "{{=URL('api', 'get_likers')}}"
-// Stars.
-var set_stars_url = "{{=URL('api', 'set_stars', user_signature=True)}}";
-var is_logged_in = {{='false' if auth.user is None else 'true'}};
-var user_email = "{{='' if auth.user is None else auth.user.email}}";
-// Delete posts.
-var delete_post_url = "{{=URL('api', 'delete_post', user_signature=True)}}";
-const iex = "https://api.iextrading.com/1.0";
-const MAX_SEARCH_RESULT = 20;
+  var get_post_list_url = "{{=URL('api', 'get_post_list')}}";
+  // Like callbacks.
+  var set_like_url = "{{=URL('api', 'set_like', user_signature=True)}}";
+  var get_likers_url = "{{=URL('api', 'get_likers')}}"
+  // Stars.
+  var set_stars_url = "{{=URL('api', 'set_stars', user_signature=True)}}";
+  var is_logged_in = {{='false' if auth.user is None else 'true'}};
+  var user_email = "{{='' if auth.user is None else auth.user.email}}";
+  // Delete posts.
+  var delete_post_url = "{{=URL('api', 'delete_post', user_signature=True)}}";
+
+  const watch_stock_ep = "{{=URL('api', 'watch_stock', user_signature=True)}}";
+  const get_watched_stocks_ep = "{{=URL('api', 'get_watched_stocks', user_signature=True)}}";
+  const iex = "https://api.iextrading.com/1.0";
+  const MAX_SEARCH_RESULT = 20;
 </script>
 {{end}}
 

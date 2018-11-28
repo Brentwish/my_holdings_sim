@@ -92,3 +92,22 @@ def set_stars():
         rating = rating
     )
     return "ok" # Might be useful in debugging.
+
+@auth.requires_signature()
+def watch_stock():
+    val = request.vars.val
+    symbol = request.vars.symbol
+    email = auth.user.email
+    if val == "true":
+        db.watched_stocks.insert(user_email = email, symbol = symbol)
+    else:
+        db(db.watched_stocks.user_email == email and db.watched_stocks.symbol == symbol).delete()
+    return response.json(dict(ok=True))
+
+@auth.requires_signature()
+def get_watched_stocks():
+    email = auth.user.email
+    result = []
+    for row in db(db.watched_stocks.user_email == email).select():
+        result.append(row.symbol)
+    return response.json(dict(symbols=result))

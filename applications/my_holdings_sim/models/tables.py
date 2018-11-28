@@ -48,3 +48,8 @@ db.define_table('thumb',
                 Field('post_id', 'reference post'), # The thumbed post
                 Field('thumb_state'), # This can be 'u' for up or 'd' for down, or None for... None.
                 )
+
+db.define_table('watched_stocks',
+  Field('user_email'),
+  Field('symbol'),
+)

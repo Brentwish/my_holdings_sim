@@ -218,10 +218,24 @@ var app = function() {
 
   self.watch_stock = symbol => {
     if (self.vue.watched_stocks[symbol]) {
-      Vue.set(self.vue.watched_stocks, symbol, false);
+      $.post(watch_stock_ep, { symbol, val: false }, res => {
+        Vue.set(self.vue.watched_stocks, symbol, false);
+      });
     } else {
-      Vue.set(self.vue.watched_stocks, symbol, true);
+      $.post(watch_stock_ep, { symbol, val: true }, res => {
+        Vue.set(self.vue.watched_stocks, symbol, true);
+      });
     }
+  }
+
+  self.get_watched_stocks = () => {
+    let result = {};
+    $.get(get_watched_stocks_ep, {}, res => {
+      console.log(res);
+      res["symbols"].forEach( s => result[s] = true);
+      self.vue.watched_stocks = result;
+      console.log(self.vue.watched_stocks);
+    });
   }
 
   // Complete as needed.
@@ -237,7 +251,7 @@ var app = function() {
       star_indices: [1, 2, 3, 4, 5],
 
       all_stocks: self.get_all_stocks(),
-      watched_stocks: {},
+      watched_stocks: self.get_watched_stocks(),
       search_result: {},
       search_query: ""
     },
@@ -247,6 +261,7 @@ var app = function() {
       get_all_stocks: self.get_all_stocks,
       is_watching: self.is_watching,
       watch_stock: self.watch_stock,
+      get_watched_stocks: self.get_watched_stocks,
       // Likers.
       like_mouseover: self.like_mouseover,
       like_mouseout: self.like_mouseout,
