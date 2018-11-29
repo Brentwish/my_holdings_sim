@@ -1,5 +1,6 @@
 # Here go your api methods.
 
+import requests
 
 @auth.requires_signature()
 def add_post():
@@ -11,31 +12,31 @@ def add_post():
     return response.json(dict(post_id=post_id))
 
 
-def get_post_list():
-    results = []
-    rows = db().select(db.post.ALL, orderby=~db.post.post_time)
-    for row in rows:
-        # I need to determine whether the user (myself, if I am logged in) liked this or not.
-        # We cannot use joins that use the "on" expression.
-        like = False
-        rating = None
-        if auth.user is not None:
-            # Checks the like.
-            r = db((db.user_like.post_id == row.id) & (db.user_like.user_email == auth.user.email)).select().first()
-            like = (r is not None)
-            # Checks the star.
-            r = db((db.user_star.post_id == row.id) & (db.user_star.user_email == auth.user.email)).select().first()
-            rating = None if r is None else r.rating
-        results.append(dict(
-            id=row.id,
-            post_title=row.post_title,
-            post_content=row.post_content,
-            post_author=row.post_author,
-            like=like,
-            rating=rating,
-        ))
-    # For homogeneity, we always return a dictionary.
-    return response.json(dict(post_list=results))
+#def get_post_list():
+#    results = []
+#    rows = db().select(db.post.ALL, orderby=~db.post.post_time)
+#    for row in rows:
+#        # I need to determine whether the user (myself, if I am logged in) liked this or not.
+#        # We cannot use joins that use the "on" expression.
+#        like = False
+#        rating = None
+#        if auth.user is not None:
+#            # Checks the like.
+#            r = db((db.user_like.post_id == row.id) & (db.user_like.user_email == auth.user.email)).select().first()
+#            like = (r is not None)
+#            # Checks the star.
+#            r = db((db.user_star.post_id == row.id) & (db.user_star.user_email == auth.user.email)).select().first()
+#            rating = None if r is None else r.rating
+#        results.append(dict(
+#            id=row.id,
+#            post_title=row.post_title,
+#            post_content=row.post_content,
+#            post_author=row.post_author,
+#            like=like,
+#            rating=rating,
+#        ))
+#    # For homogeneity, we always return a dictionary.
+#    return response.json(dict(post_list=results))
 
 
 @auth.requires_signature()
@@ -111,3 +112,32 @@ def get_watched_stocks():
     for row in db(db.watched_stocks.user_email == email).select():
         result.append(row.symbol)
     return response.json(dict(symbols=result))
+
+def search():
+    q = request.vars.query
+    for row in db.executesql('SELECT * FROM stocks s WHERE s.name LIKE "%' + q + '%";'):
+        print(row)
+    return response.json(dict(wat="wat"))
+
+@auth.requires_signature()
+def get_stocks():
+    symbols = request.vars.symbols
+    types = request.vars.types
+    if not symbols or not types:
+        print("Bad request")
+        return response.json(dict(err="Bad request"))
+
+    iex = 'https://api.iextrading.com/1.0'
+    s = 'symbols=' + (''.join((symbol + ',') for symbol in symbols)[:-1])
+    t = 'types=' + (''.join((typ + ',') for typ in types)[:-1])
+    r = requests.get(iex + '/stock/market/batch?' + s + '&' + t)
+    print(r.json())
+    return response.json(dict(wat="wat"))
+
+    #for symbol in symbols:
+    #    for row in db(db.stocks.symbol == symbol).select():
+    #        if row is None:
+    #            #Go to iex
+    #ask our database for the stocks in symbols
+        #For each hit, is its last_updated within n minutes ago?
+            #If it is 
