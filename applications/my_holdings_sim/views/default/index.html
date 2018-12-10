@@ -3,18 +3,10 @@
 {{block head}}
 <script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
-  var add_post_url = "{{=URL('api', 'add_post', user_signature=True)}}";
-  var get_post_list_url = "{{=URL('api', 'get_post_list')}}";
-  // Like callbacks.
-  var set_like_url = "{{=URL('api', 'set_like', user_signature=True)}}";
-  var get_likers_url = "{{=URL('api', 'get_likers')}}"
-  // Stars.
-  var set_stars_url = "{{=URL('api', 'set_stars', user_signature=True)}}";
-  var is_logged_in = {{='false' if auth.user is None else 'true'}};
-  var user_email = "{{='' if auth.user is None else auth.user.email}}";
-  // Delete posts.
-  var delete_post_url = "{{=URL('api', 'delete_post', user_signature=True)}}";
+  const is_logged_in = {{='false' if auth.user is None else 'true'}};
+  const user_email = "{{='' if auth.user is None else auth.user.email}}";
 
+  const search_ep = "{{=URL('api', 'search', user_signature=True)}}";
   const watch_stock_ep = "{{=URL('api', 'watch_stock', user_signature=True)}}";
   const get_watched_stocks_ep = "{{=URL('api', 'get_watched_stocks', user_signature=True)}}";
   const iex = "https://api.iextrading.com/1.0";
@@ -27,7 +19,7 @@
 
     <div id="search">
       <button id="search" v-on:click="search">Search</button>
-      <input v-on:input="search" v-model="search_query" placeholder="Search"/>
+      <input v-model="search_query" placeholder="Search"/>
       <table>
         <tr>
           <th>Logo</th>
@@ -39,7 +31,7 @@
         </tr>
         <tr v-for="(stock, symbol) in search_result">
           <td><img :src="stock.logo" width="64" height="64"/></td>
-          <td>${ symbol }</td>
+          <td>${ stock.symbol }</td>
           <td>${ stock.name }</td>
           <td>${ stock.mktcap }</td>
           <td>${ stock.price }</td>
