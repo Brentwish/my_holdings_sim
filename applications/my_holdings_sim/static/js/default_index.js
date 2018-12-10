@@ -85,12 +85,14 @@ var app = function() {
 
   self.get_watched_stocks = () => {
     let result = {};
-    $.get(get_watched_stocks_ep, {}, res => {
-      console.log(res);
-      res["symbols"].forEach( s => result[s] = true);
-      self.vue.watched_stocks = result;
-      console.log(self.vue.watched_stocks);
-    });
+    if (is_logged_in) {
+      $.get(get_watched_stocks_ep, {}, res => {
+        console.log(res);
+        res["symbols"].forEach( s => result[s] = true);
+        console.log(self.vue.watched_stocks);
+      });
+    }
+    return result;
   }
 
   // Complete as needed.
