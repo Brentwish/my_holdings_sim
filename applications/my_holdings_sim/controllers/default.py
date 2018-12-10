@@ -51,4 +51,6 @@ def call():
     """
     return service()
 
+def watched_stocks():
+    return dict()
 

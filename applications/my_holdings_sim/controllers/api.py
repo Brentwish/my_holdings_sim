@@ -16,10 +16,19 @@ def watch_stock():
 @auth.requires_signature()
 def get_watched_stocks():
     email = auth.user.email
-    result = []
-    for row in db(db.watched_stocks.user_email == email).select():
-        result.append(row.symbol)
-    return response.json(dict(symbols=result))
+    result = {}
+    select = "SELECT s.symbol, s.name, s.price, s.mktcap, s.logo "
+    where = "WHERE ws.symbol = s.symbol AND ws.user_email = '" + email + "';"
+    watched_stocks = db.executesql(select + "FROM watched_stocks ws, stocks s " + where)
+    for s in watched_stocks:
+        result[s[0]] = {
+            'symbol': s[0],
+            'name': s[1],
+            'price': s[2],
+            'mktcap': s[3],
+            'logo': s[4]
+        }
+    return response.json(dict(stocks=result))
 
 def search():
     result = {}

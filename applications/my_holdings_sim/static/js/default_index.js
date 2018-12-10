@@ -25,7 +25,6 @@ var app = function() {
   self.search = () => {
     $.get(search_ep, { query: self.vue.search_query }, res => {
       self.vue.search_result = res.result;
-      console.log(res.result);
     });
 
     //If they searched before all_stocks loads return from function
@@ -67,18 +66,22 @@ var app = function() {
   }
 
   self.is_watching = symbol => {
-    if (self.vue.watched_stocks)
-      return self.vue.watched_stocks[symbol];
+    const s = self.vue.watched_stocks;
+    if (s) {
+      return s[symbol] !== undefined;
+    }
+    return false;
   }
 
   self.watch_stock = symbol => {
     if (self.vue.watched_stocks[symbol]) {
       $.post(watch_stock_ep, { symbol, val: false }, res => {
-        Vue.set(self.vue.watched_stocks, symbol, false);
+        Vue.set(self.vue.watched_stocks, symbol, undefined);
+        delete self.vue.watched_stocks[symbol]
       });
     } else {
       $.post(watch_stock_ep, { symbol, val: true }, res => {
-        Vue.set(self.vue.watched_stocks, symbol, true);
+        Vue.set(self.vue.watched_stocks, symbol, self.vue.search_result[symbol]);
       });
     }
   }
@@ -87,12 +90,11 @@ var app = function() {
     let result = {};
     if (is_logged_in) {
       $.get(get_watched_stocks_ep, {}, res => {
-        console.log(res);
-        res["symbols"].forEach( s => result[s] = true);
-        console.log(self.vue.watched_stocks);
+        console.log("Watched Stocks: ");
+        console.log(res["stocks"]);
+        self.vue.watched_stocks = res["stocks"];
       });
     }
-    return result;
   }
 
   // Complete as needed.
