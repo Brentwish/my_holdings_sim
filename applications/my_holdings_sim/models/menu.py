@@ -50,7 +50,7 @@ def _():
     # ------------------------------------------------------------------------------------------------------------------
     response.menu += [
         (T('Watched Stocks'), False, URL('default', 'watched_stocks')),
-        (T('Sample Menu 2'), False, URL('default', 'index'))
+        (T('Sell Stocks'), False, URL('default', 'sell'))
     ]
 
 

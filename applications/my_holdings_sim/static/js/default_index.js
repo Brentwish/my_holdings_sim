@@ -26,35 +26,6 @@ var app = function() {
     $.get(search_ep, { query: self.vue.search_query }, res => {
       self.vue.search_result = res.result;
     });
-
-    //If they searched before all_stocks loads return from function
-    //if (!self.vue.all_stocks) return false;
-
-    ////Filter out strings that don't contain self.vue.search_query
-    ////Reduce it into a comma separated string of tickers for the path params
-    //let symbols = Object.keys(self.vue.all_stocks)
-    //  .filter( s => s.match(self.vue.search_query.toUpperCase()))
-    //  .slice(0, MAX_SEARCH_RESULT)
-    //  .reduce((s, c) => s + c + ",", "").slice(0, -1);
-    //let result = {};
-
-    //if (!symbols) {
-    //  self.vue.search_result = {};
-    //} else {
-    //  symbols = "symbols=" + symbols;
-    //  const types = "types=stats,price,logo";
-    //  const path = `${ iex }/stock/market/batch?${ symbols }&${ types }`;
-
-    //  $.get(path, res => {
-    //    Object.keys(res).forEach( s => {
-    //      result[s] = self.vue.all_stocks[s];
-    //      result[s]["mktcap"] = res[s]["stats"]["marketcap"];
-    //      result[s]["price"] = res[s]["price"];
-    //      result[s]["logo"] = res[s]["logo"]["url"];
-    //    });
-    //    self.vue.search_result = result;
-    //  });
-    //}
   }
 
   self.get_all_stocks = () => {
@@ -95,7 +66,17 @@ var app = function() {
         self.vue.watched_stocks = res["stocks"];
       });
     }
-  }
+  };
+
+  self.buy = symbol => {
+    window.location.href = `${buy}?s=${symbol}`;
+  };
+
+  self.buy_stock = (s, q) => {
+    $.post(buy_stock_ep, { symbol:s, quantity:q }, res => {
+      console.log(res);
+    });
+  };
 
   // Complete as needed.
   self.vue = new Vue({
@@ -107,7 +88,9 @@ var app = function() {
       all_stocks: self.get_all_stocks(),
       watched_stocks: self.get_watched_stocks(),
       search_result: {},
-      search_query: ""
+      search_query: "",
+      buy_symbol: "",
+      buy_quantity: "",
     },
     methods: {
       search: self.search,
@@ -115,6 +98,8 @@ var app = function() {
       is_watching: self.is_watching,
       watch_stock: self.watch_stock,
       get_watched_stocks: self.get_watched_stocks,
+      buy_stock: self.buy_stock,
+      buy: self.buy,
     },
   });
   return self;

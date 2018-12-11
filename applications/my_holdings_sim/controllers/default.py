@@ -11,7 +11,30 @@
 
 def index():
     # We just want to expand the template.
-    return dict()
+    balance = float(db.executesql(
+        "SELECT u.balance FROM auth_user u WHERE u.email = '" + auth.user.email + "';")[0][0]
+    )
+    return dict(balance=balance)
+
+def watched_stocks():
+    balance = float(db.executesql(
+        "SELECT u.balance FROM auth_user u WHERE u.email = '" + auth.user.email + "';")[0][0]
+    )
+    return dict(balance=balance)
+
+def buy():
+    # We just want to expand the template.
+    balance = float(db.executesql(
+        "SELECT u.balance FROM auth_user u WHERE u.email = '" + auth.user.email + "';")[0][0]
+    )
+    return dict(balance=balance)
+
+def sell():
+    # We just want to expand the template.
+    balance = float(db.executesql(
+        "SELECT u.balance FROM auth_user u WHERE u.email = '" + auth.user.email + "';")[0][0]
+    )
+    return dict(balance=balance)
 
 
 def user():
@@ -50,7 +73,3 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
-
-def watched_stocks():
-    return dict()
-

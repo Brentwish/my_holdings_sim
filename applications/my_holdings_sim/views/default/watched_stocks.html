@@ -1,0 +1,52 @@
+{{extend 'layout.html'}}
+
+{{block head}}
+<script src="{{=URL('static', 'js/vue.js')}}"></script>
+<script>
+  const is_logged_in = {{='false' if auth.user is None else 'true'}};
+  const user_email = "{{='' if auth.user is None else auth.user.email}}";
+
+  const buy = "{{=URL('default', 'buy')}}";
+  const watch_stock_ep = "{{=URL('api', 'watch_stock', user_signature=True)}}";
+  const get_watched_stocks_ep = "{{=URL('api', 'get_watched_stocks', user_signature=True)}}";
+  const iex = "https://api.iextrading.com/1.0";
+  const MAX_SEARCH_RESULT = 20;
+</script>
+{{end}}
+
+<div class="main_content">
+  <div id="vue-div" class="display:none">
+    <div id="watched_stocks">
+      <table>
+        <tr>
+          <th>Logo</th>
+          <th>Symbol</th>
+          <th>Company Name</th>
+          <th>Market Cap</th>
+          <th>Current Price</th>
+          <th>Watch Stock</th>
+          <th></th>
+        </tr>
+        <tr v-for="(stock, symbol) in watched_stocks">
+          <td><img :src="stock.logo" width="64" height="64"/></td>
+          <td>${ stock.symbol }</td>
+          <td>${ stock.name }</td>
+          <td>${ stock.mktcap }</td>
+          <td>${ stock.price }</td>
+          <td>
+            <span
+              v-on:click="watch_stock(symbol)"
+              :class="'glyphicon glyphicon' +
+                (is_watching(symbol) ? '-check' : '-eye-open')"
+            />
+          </td>
+          <td>
+            <button v-on:click="buy(symbol)">Buy!</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="{{=URL('static', 'js/default_index.js')}}"></script>

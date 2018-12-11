@@ -22,33 +22,6 @@ def get_user_email():
 def get_current_time():
     return datetime.datetime.utcnow()
 
-db.define_table('post',
-                Field('post_author', default=get_user_email()),
-                Field('post_title'),
-                Field('post_content', 'text'),
-                Field('post_time', 'datetime', default=get_current_time()),
-                )
-
-# Likes. 
-db.define_table('user_like',
-                Field('user_email'), # The user who flagged
-                Field('post_id', 'reference post'), # The flagged post
-)
-
-# Stars ratings
-db.define_table('user_star',
-                Field('user_email'), # The user who starred
-                Field('post_id', 'reference post'), # The starred post
-                Field('rating', 'integer', default=None) # The star rating.
-                )
-
-# Thumbs
-db.define_table('thumb',
-                Field('user_email'), # The user who thumbed, easier to just write the email here.
-                Field('post_id', 'reference post'), # The thumbed post
-                Field('thumb_state'), # This can be 'u' for up or 'd' for down, or None for... None.
-                )
-
 db.define_table('stocks',
   Field('symbol', notnull=True, unique=True),
   Field('last_updated', 'datetime', default=get_current_time()),
@@ -60,4 +33,10 @@ db.define_table('stocks',
 db.define_table('watched_stocks',
   Field('user_email'),
   Field('symbol'),
+)
+db.define_table('purchases',
+  Field('user_email'),
+  Field('symbol', notnull=True),
+  Field('quantity'),
+  Field('purchase_date', 'datetime', default=get_current_time()),
 )

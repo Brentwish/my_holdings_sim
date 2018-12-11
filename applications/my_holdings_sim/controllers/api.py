@@ -75,3 +75,47 @@ def search():
 
 
     return response.json(dict(result=result))
+
+@auth.requires_signature()
+def buy_stock():
+    email = auth.user.email
+    if email is None:
+        return response.json(dict(ok=False))
+
+    symbol = request.vars.symbol
+    if symbol is None:
+        return response.json(dict(ok=False))
+
+    quantity = request.vars.quantity
+    if quantity is None:
+        return response.json(dict(ok=False))
+    quantity = int(quantity)
+
+    select = "SELECT s.price FROM stocks s WHERE s.symbol = '" + symbol + "';"
+    stock_price = db.executesql(select)[0][0]
+    if stock_price is None:
+        return response.json(dict(ok=False))
+    stock_price = int(float(stock_price))
+
+    balance = db.executesql("SELECT u.balance FROM auth_user u WHERE u.email = '" + email + "';")[0][0]
+    if balance is None:
+        return response.json(dict(ok=False))
+    balance = int(float(balance))
+
+    purchase_total = quantity * stock_price
+    if purchase_total > balance:
+        return response.json(dict(ok=False, err="Insufficient balance"))
+
+
+    new_balance = str(balance - purchase_total)
+    print(new_balance)
+    db.executesql("UPDATE auth_user SET balance = " + new_balance + " WHERE email = '" + email + "';")
+
+    db.purchases.insert(
+        user_email=email,
+        symbol=symbol,
+        quantity=quantity,
+        purchase_date=get_current_time()
+    )
+
+    return response.json(dict(ok=True))

@@ -1,0 +1,28 @@
+{{extend 'layout.html'}}
+
+{{block head}}
+<script src="{{=URL('static', 'js/vue.js')}}"></script>
+<script>
+  const is_logged_in = {{='false' if auth.user is None else 'true'}};
+  const user_email = "{{='' if auth.user is None else auth.user.email}}";
+
+  const buy_stock_ep = "{{=URL('api', 'buy_stock', user_signature=True)}}";
+  const get_watched_stocks_ep = "{{=URL('api', 'get_watched_stocks', user_signature=True)}}";
+  const iex = "https://api.iextrading.com/1.0";
+  const MAX_SEARCH_RESULT = 20;
+</script>
+{{end}}
+
+<div class="main_content">
+  <div id="vue-div">
+    <form>
+      <label>Symbol</label>
+      <input v-model="buy_symbol" type="text" placeholder="Enter a stock symbol"/>
+      <label>Quantity</label>
+      <input v-model="buy_quantity" type="number" placeholder="Enter a quantity"/>
+      <button type=button id="buy" v-on:click="buy_stock(buy_symbol, buy_quantity)">Buy!</button>
+    </form>
+  </div>
+</div>
+
+<script src="{{=URL('static', 'js/default_index.js')}}"></script>
