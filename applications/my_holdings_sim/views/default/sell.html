@@ -6,6 +6,7 @@
   const is_logged_in = {{='false' if auth.user is None else 'true'}};
   const user_email = "{{='' if auth.user is None else auth.user.email}}";
 
+  const sell_stock_ep = "{{=URL('api', 'sell_stock', user_signature=True)}}";
   const get_purchases_ep = "{{=URL('api', 'get_purchases', user_signature=True)}}";
   const get_watched_stocks_ep = "{{=URL('api', 'get_watched_stocks', user_signature=True)}}";
 </script>
@@ -23,15 +24,15 @@
         <th>Estimated Value</th>
         <th></th>
       </tr>
-      <tr v-for="(purchase, symbol) in purchases">
+      <tr v-for="purchase in purchases">
         <td><img :src="purchase.logo" width="64" height="64"/></td>
-        <td>${ symbol }</td>
+        <td>${ purchase.symbol }</td>
         <td>${ purchase.name }</td>
         <td>$${ purchase.price }</td>
         <td>${ purchase.quantity }</td>
         <td>$${ purchase.quantity * purchase.price }</td>
         <td>
-          <button v-on:click="sell(symbol)">Sell!</button>
+          <button v-on:click="sell_stock(purchase.symbol)">Sell!</button>
         </td>
       </tr>
     </table>

@@ -9,19 +9,17 @@ def get_purchases():
     tables = " stocks s, purchases p "
     cond = " p.user_email = '" + email + "' AND p.symbol = s.symbol"
     purchases = db.executesql("SELECT" + fields + "FROM" + tables + "WHERE" + cond + ";")
-    result = {}
+    result = []
     for p in purchases:
-        result[p[0]] = {
+        result.append({
             'symbol': p[0],
             'name': p[1],
             'price': p[2],
             'mktcap': p[3],
             'logo': p[4],
             'quantity': p[5]
-        }
+        })
     return response.json(dict(ok=True, purchases=result))
-
-
 
 @auth.requires_signature()
 def watch_stock():
@@ -57,8 +55,10 @@ def search():
     iex = "https://api.iextrading.com/1.0"
     select = "SELECT last_updated, symbol, name, price, mktcap, logo"
     where = "WHERE LOWER(symbol) LIKE '%" + q + "%' OR LOWER(symbol) LIKE '" + q + "';"
-    search_result = db.executesql(select + " FROM stocks " + where)[:20]
-    should_update = any(map(lambda s: (s[0] is None), search_result))
+    search_result = db.executesql(select + " FROM stocks " + where)
+    should_update = any(map(lambda s:
+        (s[0] is None or s[0] > get_current_time() + timedelta(minutes=1)), search_result
+    ))
     if should_update:
         symbols = 'symbols=' + ','.join(map((lambda s: s[1]), search_result))
         types = 'types=' + ','.join(['price', 'stats', 'logo'])
@@ -106,6 +106,7 @@ def buy_stock():
     symbol = request.vars.symbol
     if symbol is None:
         return response.json(dict(ok=False))
+    symbol = symbol.upper()
 
     quantity = request.vars.quantity
     if quantity is None:
@@ -131,10 +132,59 @@ def buy_stock():
         user_email=email,
         symbol=symbol,
         quantity=quantity,
+        purchase_price=stock_price,
         purchase_date=get_current_time()
     )
 
     new_balance = str(balance - purchase_total)
     db.executesql("UPDATE auth_user SET balance = " + new_balance + " WHERE email = '" + email + "';")
 
+    redirect(URL(c='default', f='index'), client_side=True)
+    return response.json(dict(ok=True))
+
+@auth.requires_signature()
+def sell_stock():
+    email = auth.user.email
+    if email is None:
+        return response.json(dict(ok=False))
+    print(email)
+
+    symbol = request.vars.symbol
+    if symbol is None:
+        return response.json(dict(ok=False))
+    print(symbol)
+
+    select = "SELECT s.price FROM stocks s WHERE s.symbol = '" + symbol + "';"
+    current_stock_price = db.executesql(select)[0][0]
+    if current_stock_price is None:
+        return response.json(dict(ok=False))
+    current_stock_price = int(float(current_stock_price))
+    print(current_stock_price)
+
+    select = "SELECT p.quantity, p.id FROM purchases p WHERE p.symbol = '" + symbol + "';"
+    purchase = db.executesql(select)[0]
+
+    purchased_stock_quantity = purchase[0]
+    if purchased_stock_quantity is None:
+        return response.json(dict(ok=False))
+    purchased_stock_quantity = int(purchased_stock_quantity)
+    print(purchased_stock_quantity)
+
+    purchase_id = purchase[1]
+
+    balance = db.executesql("SELECT u.balance FROM auth_user u WHERE u.email = '" + email + "';")[0][0]
+    if balance is None:
+        return response.json(dict(ok=False))
+    balance = int(float(balance))
+    print(balance)
+
+    profit = purchased_stock_quantity*(current_stock_price)
+    print(profit)
+
+    new_balance = str(balance + profit)
+    db.executesql("UPDATE auth_user SET balance = " + new_balance + " WHERE email = '" + email + "';")
+    db.executesql("DELETE FROM purchases WHERE id = " + str(purchase_id) + ";")
+
+
+    redirect(URL(c='default', f='index'), client_side=True)
     return response.json(dict(ok=True))

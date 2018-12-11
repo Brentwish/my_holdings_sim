@@ -15,6 +15,7 @@
 
 
 import datetime
+from datetime import timedelta
 
 def get_user_email():
     return None if auth.user is None else auth.user.email
@@ -35,8 +36,9 @@ db.define_table('watched_stocks',
   Field('symbol'),
 )
 db.define_table('purchases',
-  Field('user_email'),
+  Field('user_email', notnull=True),
   Field('symbol', notnull=True),
-  Field('quantity'),
+  Field('quantity', notnull=True),
+  Field('purchase_price', notnull=True),
   Field('purchase_date', 'datetime', default=get_current_time()),
 )

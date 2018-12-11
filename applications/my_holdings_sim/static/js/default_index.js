@@ -4,9 +4,12 @@ var app = function() {
   Vue.config.silent = false; // show all warnings
 
   self.search = () => {
-    $.get(search_ep, { query: self.vue.search_query }, res => {
-      self.vue.search_result = res.result;
-    });
+    const q = self.vue.search_query;
+    if (q) {
+      $.get(search_ep, { query: self.vue.search_query }, res => {
+        self.vue.search_result = res.result;
+      });
+    }
   }
 
   self.is_watching = symbol => {
@@ -69,6 +72,13 @@ var app = function() {
     }
   }
 
+  self.sell_stock = symbol => {
+    $.post(sell_stock_ep, { symbol }, res => {
+      console.log(res);
+      self.get_purchases();
+    });
+  }
+
   // Complete as needed.
   self.vue = new Vue({
     el: "#vue-div",
@@ -90,6 +100,7 @@ var app = function() {
       get_watched_stocks: self.get_watched_stocks,
       get_purchases: self.get_purchases,
       buy_stock: self.buy_stock,
+      sell_stock: self.sell_stock,
       buy: self.buy,
     },
   });

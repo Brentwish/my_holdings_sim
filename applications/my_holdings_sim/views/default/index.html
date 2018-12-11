@@ -6,6 +6,7 @@
   const is_logged_in = {{='false' if auth.user is None else 'true'}};
   const user_email = "{{='' if auth.user is None else auth.user.email}}";
 
+  const buy = "{{=URL('default', 'buy', user_signature=True)}}";
   const get_purchases_ep = "{{=URL('api', 'get_purchases', user_signature=True)}}";
   const search_ep = "{{=URL('api', 'search', user_signature=True)}}";
   const watch_stock_ep = "{{=URL('api', 'watch_stock', user_signature=True)}}";
@@ -40,6 +41,9 @@
               :class="'glyphicon glyphicon' +
                 (is_watching(symbol) ? '-check' : '-eye-open')"
             />
+          </td>
+          <td>
+            <button v-if="is_logged_in" v-on:click="buy(symbol)">Buy!</button>
           </td>
         </tr>
       </table>
