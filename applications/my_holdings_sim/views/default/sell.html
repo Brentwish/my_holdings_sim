@@ -28,9 +28,9 @@
         <td><img :src="purchase.logo" width="64" height="64"/></td>
         <td>${ purchase.symbol }</td>
         <td>${ purchase.name }</td>
-        <td>$${ purchase.price }</td>
+        <td>$${ parseFloat(purchase.price).toFixed(2) }</td>
         <td>${ purchase.quantity }</td>
-        <td>$${ purchase.quantity * purchase.price }</td>
+        <td>$${ (purchase.quantity * purchase.price).toFixed(2) }</td>
         <td>
           <button v-on:click="sell_stock(purchase.symbol)">Sell!</button>
         </td>

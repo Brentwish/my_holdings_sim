@@ -3,6 +3,18 @@ var app = function() {
   var self = {};
   Vue.config.silent = false; // show all warnings
 
+  self.numatter = num => {
+    if (num > 999999999) {
+        return (num/1000000000).toFixed(1) + 'B';
+    } else if (num > 999999 ) {
+        return (num/1000000).toFixed(1) + 'M';
+    } else if (num > 999 ) {
+        return (num/1000).toFixed(1) + 'K';
+    } else {
+      return num;
+    }
+  }
+
   self.search = () => {
     const q = self.vue.search_query;
     if (q) {
@@ -102,6 +114,7 @@ var app = function() {
       buy_stock: self.buy_stock,
       sell_stock: self.sell_stock,
       buy: self.buy,
+      numatter: self.numatter
     },
   });
   return self;

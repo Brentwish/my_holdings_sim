@@ -30,8 +30,8 @@
           <td><img :src="stock.logo" width="64" height="64"/></td>
           <td>${ stock.symbol }</td>
           <td>${ stock.name }</td>
-          <td>${ stock.mktcap }</td>
-          <td>$${ stock.price }</td>
+          <td>${ numatter(stock.mktcap) }</td>
+          <td>$${ parseFloat(stock.price).toFixed(2) }</td>
           <td>
             <span
               v-on:click="watch_stock(symbol)"
