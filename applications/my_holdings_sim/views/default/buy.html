@@ -6,10 +6,9 @@
   const is_logged_in = {{='false' if auth.user is None else 'true'}};
   const user_email = "{{='' if auth.user is None else auth.user.email}}";
 
+  const get_purchases_ep = "{{=URL('api', 'get_purchases', user_signature=True)}}";
   const buy_stock_ep = "{{=URL('api', 'buy_stock', user_signature=True)}}";
   const get_watched_stocks_ep = "{{=URL('api', 'get_watched_stocks', user_signature=True)}}";
-  const iex = "https://api.iextrading.com/1.0";
-  const MAX_SEARCH_RESULT = 20;
 </script>
 {{end}}
 

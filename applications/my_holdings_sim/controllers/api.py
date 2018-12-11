@@ -3,6 +3,27 @@
 import requests
 
 @auth.requires_signature()
+def get_purchases():
+    email = auth.user.email
+    fields = " s.symbol, s.name, s.price, s.mktcap, s.logo, p.quantity "
+    tables = " stocks s, purchases p "
+    cond = " p.user_email = '" + email + "' AND p.symbol = s.symbol"
+    purchases = db.executesql("SELECT" + fields + "FROM" + tables + "WHERE" + cond + ";")
+    result = {}
+    for p in purchases:
+        result[p[0]] = {
+            'symbol': p[0],
+            'name': p[1],
+            'price': p[2],
+            'mktcap': p[3],
+            'logo': p[4],
+            'quantity': p[5]
+        }
+    return response.json(dict(ok=True, purchases=result))
+
+
+
+@auth.requires_signature()
 def watch_stock():
     val = request.vars.val
     symbol = request.vars.symbol
@@ -106,16 +127,14 @@ def buy_stock():
     if purchase_total > balance:
         return response.json(dict(ok=False, err="Insufficient balance"))
 
-
-    new_balance = str(balance - purchase_total)
-    print(new_balance)
-    db.executesql("UPDATE auth_user SET balance = " + new_balance + " WHERE email = '" + email + "';")
-
     db.purchases.insert(
         user_email=email,
         symbol=symbol,
         quantity=quantity,
         purchase_date=get_current_time()
     )
+
+    new_balance = str(balance - purchase_total)
+    db.executesql("UPDATE auth_user SET balance = " + new_balance + " WHERE email = '" + email + "';")
 
     return response.json(dict(ok=True))

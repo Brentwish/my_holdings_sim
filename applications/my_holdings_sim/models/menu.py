@@ -49,8 +49,9 @@ def _():
     # useful links to internal and external resources
     # ------------------------------------------------------------------------------------------------------------------
     response.menu += [
-        (T('Watched Stocks'), False, URL('default', 'watched_stocks')),
-        (T('Sell Stocks'), False, URL('default', 'sell'))
+        (T('Buy Stocks'), False, URL('default', 'buy')),
+        (T('Sell Stocks'), False, URL('default', 'sell')),
+        (T('Watched Stocks'), False, URL('default', 'watched_stocks'))
     ]
 
 

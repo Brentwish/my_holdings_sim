@@ -6,11 +6,10 @@
   const is_logged_in = {{='false' if auth.user is None else 'true'}};
   const user_email = "{{='' if auth.user is None else auth.user.email}}";
 
-  const buy = "{{=URL('default', 'buy')}}";
+  const get_purchases_ep = "{{=URL('api', 'get_purchases', user_signature=True)}}";
+  const buy = "{{=URL('default', 'buy', user_signature=True)}}";
   const watch_stock_ep = "{{=URL('api', 'watch_stock', user_signature=True)}}";
   const get_watched_stocks_ep = "{{=URL('api', 'get_watched_stocks', user_signature=True)}}";
-  const iex = "https://api.iextrading.com/1.0";
-  const MAX_SEARCH_RESULT = 20;
 </script>
 {{end}}
 
@@ -32,7 +31,7 @@
           <td>${ stock.symbol }</td>
           <td>${ stock.name }</td>
           <td>${ stock.mktcap }</td>
-          <td>${ stock.price }</td>
+          <td>$${ stock.price }</td>
           <td>
             <span
               v-on:click="watch_stock(symbol)"
